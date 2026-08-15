@@ -1,0 +1,6 @@
+MQTT_BROKER = "localhost"
+MQTT_PORT = 1883
+
+MQTT_KEEPALIVE = 60
+
+BASE_TOPIC = "scems"
