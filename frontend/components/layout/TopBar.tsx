@@ -5,16 +5,15 @@ import { useEffect } from "react";
 import { IconBell, IconBellDot, IconLogo } from "@/components/icons";
 import { StatusDot } from "@/components/ui";
 import { getHealth } from "@/lib/api";
-import { cn } from "@/lib/format";
 import { useApi } from "@/hooks/useApi";
 import { useRealtime } from "@/providers/realtime";
 import { useNow } from "@/hooks/useNow";
 
-const WS_LABEL: Record<string, { label: string; color: string; pulse: boolean }> = {
-  connected: { label: "LIVE", color: "#4ADE80", pulse: true },
-  connecting: { label: "CONNECTING", color: "#F5B942", pulse: false },
-  reconnecting: { label: "RECONNECTING", color: "#F5B942", pulse: false },
-  disconnected: { label: "CONNECTION LOST", color: "#EF4444", pulse: false },
+const WS_LABEL: Record<string, { label: string; color: string; bg: string; border: string; pulse: boolean }> = {
+  connected: { label: "LIVE", color: "#059669", bg: "#ecfdf5", border: "#a7f3d0", pulse: true },
+  connecting: { label: "CONNECTING", color: "#d97706", bg: "#fffbeb", border: "#fde68a", pulse: false },
+  reconnecting: { label: "RECONNECTING", color: "#d97706", bg: "#fffbeb", border: "#fde68a", pulse: false },
+  disconnected: { label: "CONNECTION LOST", color: "#dc2626", bg: "#fef2f2", border: "#fecaca", pulse: false },
 };
 
 function HealthPill() {
@@ -30,18 +29,18 @@ function HealthPill() {
   const apiOk = data?.status === "healthy" && data != null;
 
   const overall = apiOk ? (databaseOk && mqttOk ? "SYSTEM ONLINE" : "DEGRADED") : "OFFLINE";
-  const color = apiOk && databaseOk && mqttOk ? "#4ADE80" : apiOk ? "#F5B942" : "#EF4444";
+  const color = apiOk && databaseOk && mqttOk ? "#059669" : apiOk ? "#d97706" : "#dc2626";
+  const bg = apiOk && databaseOk && mqttOk ? "#ecfdf5" : apiOk ? "#fffbeb" : "#fef2f2";
+  const border = apiOk && databaseOk && mqttOk ? "#a7f3d0" : apiOk ? "#fde68a" : "#fecaca";
 
   return (
     <button
       onClick={reload}
       title={`API ${data?.status ?? "unknown"} · Database ${data?.database ?? "unknown"} · MQTT ${data?.mqtt ?? "unknown"}`}
-      className={cn(
-        "flex items-center gap-2 rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide transition-colors",
-      )}
-      style={{ color, borderColor: `${color}3d`, backgroundColor: `${color}14` }}
+      className="hidden items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-wide transition-colors hover:brightness-[0.98] sm:flex"
+      style={{ color, borderColor: border, backgroundColor: bg }}
     >
-      <StatusDot color={color} pulse={apiOk} />
+      <StatusDot color={color} pulse={apiOk} size={7} />
       {overall}
     </button>
   );
@@ -54,44 +53,55 @@ export default function TopBar() {
   const unread = alerts.filter((a) => a.status === "active" || a.id == null).length;
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-line bg-app2/80 px-4 backdrop-blur-sm">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line2 bg-card2 text-ok">
+    <header className="flex h-[64px] shrink-0 items-center justify-between gap-4 border-b border-[#e2e8f0] bg-white px-4 sm:px-6 shadow-[0_1px_3px_rgba(15,23,42,0.04)]">
+      {/* Left — Brand + title */}
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white shadow-sm shadow-[#2563eb]/20 md:hidden">
           <IconLogo size={20} />
         </div>
         <div className="min-w-0 leading-none">
-          <h1 className="text-sm font-semibold tracking-tight text-ink">SCEMS</h1>
-          <p className="mt-1 truncate text-[11px] text-muted">
+          <div className="flex items-center gap-2">
+            <h1 className="text-[15px] font-bold tracking-tight text-[#0f172a]">SCEMS</h1>
+            <span className="hidden rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#2563eb] ring-1 ring-[#dbeafe] sm:inline-flex">
+              CAMPUS IOT
+            </span>
+          </div>
+          <p className="mt-1 hidden text-xs font-medium text-[#64748b] sm:block">
             Smart Campus Environmental Monitoring System
           </p>
+          <p className="mt-1 text-xs font-medium text-[#64748b] sm:hidden">Environmental Monitoring</p>
         </div>
       </div>
 
+      {/* Right — Status + actions */}
       <div className="flex items-center gap-2.5">
+        {/* LIVE pill — Zoho style */}
         <div
-          className="hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide sm:flex"
-          style={{ color: ws.color, borderColor: `${ws.color}3d`, backgroundColor: `${ws.color}12` }}
+          className="hidden items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-wide sm:flex"
+          style={{ color: ws.color, borderColor: ws.border, backgroundColor: ws.bg }}
           title={`Realtime WebSocket: ${connection}`}
         >
-          <StatusDot color={ws.color} pulse={ws.pulse} />
+          <StatusDot color={ws.color} pulse={ws.pulse} size={7} />
           {ws.label}
-          {connection === "reconnecting" && <span className="hidden xl:inline">· Reconnecting…</span>}
+          {connection === "reconnecting" && <span className="hidden xl:inline font-medium">· Reconnecting…</span>}
         </div>
 
         {updatedAt && (
-          <span className="hidden text-[11px] text-muted lg:block">
+          <span className="hidden text-xs font-medium text-[#94a3b8] lg:block">
             Updated {Math.max(1, Math.round((now - updatedAt) / 1000))}s ago
           </span>
         )}
 
+        <div className="h-6 w-px bg-[#e2e8f0] hidden sm:block" />
+
         <Link
           href="/alerts"
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-card text-secondary transition-colors hover:text-ink"
+          className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white text-[#64748b] shadow-sm transition-all hover:border-[#cbd5e1] hover:text-[#0f172a] hover:shadow-md"
           title="Alerts"
         >
-          {unread > 0 ? <IconBellDot size={17} /> : <IconBell size={17} />}
+          {unread > 0 ? <IconBellDot size={18} /> : <IconBell size={18} />}
           {unread > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-crit px-1 text-[9px] font-bold text-white">
+            <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
               {unread > 9 ? "9+" : unread}
             </span>
           )}

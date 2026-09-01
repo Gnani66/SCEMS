@@ -40,25 +40,26 @@ export default function AlertDetailModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <button className="absolute inset-0 bg-black/70" onClick={onClose} aria-label="Close" />
-      <div className="alert-in relative w-full max-w-sm rounded-xl border border-line2 bg-elev p-5 shadow-2xl">
-        <div className="mb-4 flex items-start justify-between">
+      <button className="absolute inset-0 bg-[#0f172a]/50 backdrop-blur-sm" onClick={onClose} aria-label="Close" />
+      <div className="alert-in relative w-full max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl">
+        <div className="mb-5 flex items-start justify-between">
           <div>
-            <p className="section-kicker mb-1">Alert Details</p>
-            <h3 className="text-[15px] font-semibold text-ink">{alert.sensor}</h3>
+            <p className="section-kicker mb-1.5">Alert Details</p>
+            <h3 className="text-[16px] font-bold tracking-tight text-[#0f172a]">{alert.sensor}</h3>
+            <p className="text-xs font-medium text-[#64748b]">{alert.node_id} · {alert.alert_type}</p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-muted transition-colors hover:bg-white/5 hover:text-ink"
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white text-[#64748b] shadow-sm transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a]"
           >
-            <IconClose size={15} />
+            <IconClose size={16} />
           </button>
         </div>
 
-        <dl className="mb-4 space-y-2.5 text-[12px]">
-          <Row label="Node" value={alert.node_id} />
-          <Row label="Parameter" value={alert.sensor} />
-          <Row label="Value" value={`${alert.actual_value}`} highlight />
+        <dl className="mb-4 space-y-3 rounded-xl bg-[#f8fafc] p-4 ring-1 ring-[#f1f5f9]">
+          <Row label="Node" value={<span className="font-mono text-xs font-semibold">{alert.node_id}</span>} />
+          <Row label="Parameter" value={<span className="font-semibold capitalize">{alert.sensor}</span>} />
+          <Row label="Value" value={<span className="rounded-lg bg-white px-2 py-1 font-bold ring-1 ring-[#e2e8f0]">{`${alert.actual_value}`}</span>} />
           <Row label="Threshold" value={`${alert.threshold}`} />
           <Row label="Severity" value={<SeverityBadge severity={alert.severity} />} />
           <Row
@@ -67,48 +68,48 @@ export default function AlertDetailModal({
           />
         </dl>
 
-        <div className="mb-4 rounded-lg border border-line bg-app2 px-3 py-2.5">
-          <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold" style={{ color }}>
+        <div className="mb-4 rounded-xl border border-[#fde68a] bg-[#fffbeb] px-4 py-3">
+          <p className="mb-1 flex items-center gap-1.5 text-xs font-bold" style={{ color }}>
             <StatusDot color={color} size={6} />
             {alert.severity.toUpperCase()}
           </p>
-          <p className="text-[12px] leading-snug text-secondary">
+          <p className="text-sm leading-snug text-[#334155]">
             {alert.message || `${alert.sensor} threshold breached on ${alert.node_id}`}
           </p>
         </div>
 
-        {error && <p className="mb-3 text-[11px] text-crit">{error}</p>}
+        {error && <p className="mb-3 rounded-lg bg-[#fef2f2] px-3 py-2 text-xs font-medium text-[#dc2626] ring-1 ring-[#fecaca]">{error}</p>}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleAcknowledge}
             disabled={done || busy || alert.id == null}
             className={cn(
-              "flex-1 rounded-lg border px-3 py-2 text-[12px] font-semibold transition-colors",
+              "flex-1 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors shadow-sm",
               done
-                ? "border-line bg-app2 text-muted"
-                : "border-line2 bg-card2 text-ink hover:bg-elev disabled:opacity-50",
+                ? "border border-[#e2e8f0] bg-[#f1f5f9] text-[#64748b]"
+                : "bg-[#2563eb] text-white hover:bg-[#1d4ed8] disabled:opacity-50 disabled:cursor-not-allowed shadow-[#2563eb]/20",
             )}
           >
             {done
               ? "Acknowledged"
               : busy
-                ? "Acknowledging…"
+                ? "Acknowledging..."
                 : alert.id == null
                   ? "Awaiting sync"
                   : "Acknowledge Alert"}
           </button>
           <button
             onClick={onClose}
-            className="rounded-lg border border-line px-3 py-2 text-[12px] text-secondary transition-colors hover:text-ink"
+            className="rounded-xl border border-[#e2e8f0] bg-white px-4 py-2.5 text-sm font-semibold text-[#334155] shadow-sm transition-colors hover:bg-[#f8fafc]"
           >
             Close
           </button>
         </div>
 
         {done && (
-          <p className="mt-2 text-[11px] text-ok">
-            Alert acknowledged · synced to server
+          <p className="mt-3 rounded-lg bg-[#ecfdf5] px-3 py-2 text-xs font-semibold text-[#059669] ring-1 ring-[#a7f3d0]">
+            Alert acknowledged — synced to server
           </p>
         )}
       </div>
@@ -119,16 +120,14 @@ export default function AlertDetailModal({
 function Row({
   label,
   value,
-  highlight,
 }: {
   label: string;
   value: React.ReactNode;
-  highlight?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <dt className="text-muted">{label}</dt>
-      <dd className={cn("text-tabular font-medium text-ink", highlight && "text-base")}>{value}</dd>
+    <div className="flex items-center justify-between text-sm">
+      <dt className="font-medium text-[#64748b]">{label}</dt>
+      <dd className="text-tabular font-semibold text-[#0f172a]">{value}</dd>
     </div>
   );
 }

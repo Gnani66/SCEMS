@@ -14,34 +14,35 @@ import type { Alert } from "@/types/scems";
 
 function AlertRow({ alert, onClick }: { alert: Alert; onClick: () => void }) {
   const now = useNow(1000);
-  const statusOk = alert.severity === "normal";
+  const isCrit = alert.severity === "critical";
+  const isWarn = alert.severity === "warning";
 
   return (
     <button
       onClick={onClick}
-      className="alert-in group flex w-full flex-col gap-2 border-b border-line px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-white/[0.03]"
+      className="alert-in group flex w-full flex-col gap-2 border-b border-[#f1f5f9] px-4 py-3.5 text-left transition-colors last:border-b-0 hover:bg-[#f8fafc]"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="flex min-w-0 items-center gap-2 text-[11px] font-semibold tracking-wide text-secondary">
-          <StatusDot color={statusOk ? "#4ADE80" : alert.severity === "critical" ? "#EF4444" : "#F5B942"} size={6} />
+        <span className="flex min-w-0 items-center gap-2 text-xs font-bold tracking-wide text-[#0f172a]">
+          <StatusDot color={isCrit ? "#dc2626" : isWarn ? "#d97706" : "#059669"} size={7} />
           {alert.node_id}
         </span>
-        <span className="shrink-0 rounded-md bg-app2 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-info">
+        <span className="shrink-0 rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#2563eb] ring-1 ring-[#dbeafe]">
           {alert.alert_type.toUpperCase()}
         </span>
       </div>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-[12px] text-secondary">
-          <span className="font-medium capitalize text-ink">{alert.sensor}</span>
-          <span className="text-muted"> · {alert.message}</span>
+        <span className="truncate text-sm">
+          <span className="font-semibold capitalize text-[#0f172a]">{alert.sensor}</span>
+          <span className="font-medium text-[#64748b]"> · {alert.message}</span>
         </span>
-        <span className="text-tabular text-[12px] font-semibold text-ink">
+        <span className="shrink-0 rounded-lg bg-[#f1f5f9] px-2 py-1 text-tabular text-xs font-bold text-[#0f172a]">
           {formatValue(alert.sensor, alert.actual_value)}
         </span>
       </div>
       <div className="flex items-center justify-between">
         <SeverityBadge severity={alert.severity} />
-        <span className="text-[10px] text-muted">
+        <span className="text-xs font-medium text-[#94a3b8]">
           {alert.created_at ? timeAgo(alert.created_at, now) : "now"}
         </span>
       </div>
@@ -74,14 +75,31 @@ export default function ActiveAlerts({
   const { alerts: liveAlerts, upsertActiveAlerts } = useRealtime();
   const [selected, setSelected] = useState<Alert | null>(null);
 
-  // Roll live WS alerts into the list (they are not yet in the DB poll).
+  // Poll active alerts every 15s as fallback when WS stalls
+  useEffect(() => {
+    const id = setInterval(() => reload(), 15000);
+    return () => clearInterval(id);
+  }, [reload]);
+
   const active = useMemo(() => {
     const apiAlerts = (data?.alerts ?? []).filter(
-      (a: Alert) => a.status === "active" || !a.status,
+      (a: Alert) => a.status === "active",
     );
-    const seen = new Set(apiAlerts.map((a) => a.id));
-    const live = liveAlerts.filter((a) => (a.id == null || !seen.has(a.id)));
-    return [...live, ...apiAlerts];
+    // Deduplicate: only keep real backend alerts with id
+    const byId = new Map<number | string, Alert>();
+    for (const a of apiAlerts) {
+      if (a.id != null) byId.set(a.id, a);
+    }
+    for (const a of liveAlerts) {
+      if (a.status === "acknowledged") continue;
+      if (a.status !== "active" && a.status !== "critical" && a.status !== "warning") continue;
+      const key = a.id != null ? a.id : `${a.node_id}-${a.sensor}-${a.created_at}`;
+      if (a.id == null && !a.created_at) continue;
+      if (!byId.has(key)) byId.set(key, a);
+    }
+    return Array.from(byId.values()).sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
   }, [data, liveAlerts]);
 
   useEffect(() => {
@@ -97,8 +115,9 @@ export default function ActiveAlerts({
       kicker="Event stream"
       title="Active Alerts"
       right={
-        <span className="rounded-full bg-crit/15 px-2 py-0.5 text-[10px] font-semibold text-crit">
-          {active.length}
+        <span className="flex items-center gap-1.5 rounded-full bg-[#fef2f2] px-2.5 py-1 text-xs font-bold text-[#dc2626] ring-1 ring-[#fecaca]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#dc2626]" />
+          {active.length} active
         </span>
       }
     >
@@ -106,7 +125,7 @@ export default function ActiveAlerts({
         {error ? (
           <ErrorState message="Unable to load alerts" onRetry={reload} />
         ) : loading && shown.length === 0 ? (
-          <div className="p-3">
+          <div className="p-4">
             <Skeleton lines={4} />
           </div>
         ) : shown.length === 0 ? (
@@ -122,9 +141,9 @@ export default function ActiveAlerts({
         {showViewAll && (
           <Link
             href="/alerts"
-            className="flex items-center justify-center gap-1 border-t border-line py-2.5 text-[12px] text-secondary transition-colors hover:text-ink"
+            className="flex items-center justify-center gap-1.5 border-t border-[#f1f5f9] bg-[#f8fafc] py-3 text-sm font-semibold text-[#2563eb] transition-colors hover:bg-[#f1f5f9] hover:text-[#1d4ed8]"
           >
-            View all alerts <IconChevronRight size={13} />
+            View all alerts <IconChevronRight size={14} />
           </Link>
         )}
       </div>
@@ -146,7 +165,5 @@ export default function ActiveAlerts({
 function apiActiveOnly(
   data: { alerts: Alert[] } | null,
 ): Alert[] {
-  return (data?.alerts ?? []).filter(
-    (a) => a.status === "active" || !a.status,
-  );
+  return (data?.alerts ?? []).filter((a) => a.status === "active");
 }

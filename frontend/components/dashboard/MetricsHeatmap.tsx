@@ -82,31 +82,32 @@ export default function MetricsHeatmap({
       kicker="Last 24 hours"
       title="Environmental History"
       right={
-        <span className="text-[11px] text-muted">
-          {count > 0 ? `${count} readings` : ""}
-        </span>
+        count > 0 ? (
+          <span className="rounded-full bg-[#f1f5f9] px-2.5 py-1 text-xs font-medium text-[#64748b] ring-1 ring-[#e2e8f0]">
+            {count} readings
+          </span>
+        ) : null
       }
     >
       {error ? (
         <ErrorState message="Unable to load history" onRetry={reload} />
       ) : loading ? (
-        <div className="p-3"><Skeleton className="h-[140px] w-full" /></div>
+        <div className="p-4"><Skeleton className="h-[160px] w-full" /></div>
       ) : buckets.length === 0 ? (
-        <EmptyState message="No data available" />
+        <EmptyState message="No history yet" sub="Data will appear as sensors report" />
       ) : (
-        <div className="flex h-full flex-col justify-between px-3 py-2">
+        <div className="flex h-full flex-col justify-between px-4 py-4">
           <div
             className="grid w-full gap-px"
             style={{
-              gridTemplateColumns: `${HEAT_ROWS.length > 0 ? "74px" : ""} repeat(${buckets.length}, minmax(0, 1fr))`,
+              gridTemplateColumns: `${HEAT_ROWS.length > 0 ? "84px" : ""} repeat(${buckets.length}, minmax(0, 1fr))`,
             }}
           >
             <div />
             {buckets.map((b) => (
               <div
                 key={b.start}
-                className="text-right text-[8px] leading-relaxed text-faint"
-                title={new Date(b.start).toLocaleTimeString()}
+                className="text-center text-[9px] font-semibold tracking-wide text-[#94a3b8]"
               >
                 {new Date(b.start).getHours().toString().padStart(2, "0")}
               </div>
@@ -114,28 +115,29 @@ export default function MetricsHeatmap({
           </div>
 
           <div
-            className="grid flex-1 gap-px"
-            style={{ gridTemplateColumns: `74px repeat(${buckets.length}, minmax(0,1fr))` }}
+            className="mt-2 grid flex-1 gap-1"
+            style={{ gridTemplateColumns: `84px repeat(${buckets.length}, minmax(0,1fr))` }}
           >
             {HEAT_ROWS.map((row) => {
               const meta = METRICS.find((m) => m.key === row.key)!;
               return (
                 <Fragment key={row.key}>
-                  <div className="flex items-center gap-1.5 pr-2 text-[9px] uppercase tracking-wider text-muted">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: meta.accent }} />
+                  <div className="flex items-center gap-2 pr-2 text-[10px] font-bold uppercase tracking-widest text-[#64748b]">
+                    <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: meta.accent }} />
                     {meta.short}
                   </div>
                   {buckets.map((b) => {
                     const value = b.cells[row.key];
                     if (value == null) {
-                      return <div key={`${row.key}-${b.start}`} className="h-full min-h-4 rounded-[3px] bg-line/40" />;
+                      return <div key={`${row.key}-${b.start}`} className="h-6 rounded-md bg-[#f8fafc] ring-1 ring-[#f1f5f9]" />;
                     }
                     const pct = Math.min(value / row.max, 1);
+                    const alpha = Math.round(22 + pct * 150).toString(16).padStart(2, "0");
                     return (
                       <div
                         key={`${row.key}-${b.start}`}
-                        className="h-full min-h-4 rounded-[3px] transition-colors"
-                        style={{ backgroundColor: `${meta.accent}${Math.round(18 + pct * 110).toString(16).padStart(2, "0")}` }}
+                        className="h-6 rounded-md ring-1 ring-black/5 transition-colors hover:brightness-110"
+                        style={{ backgroundColor: `${meta.accent}${alpha}` }}
                         title={`${meta.label}: ${value.toFixed(1)}`}
                       />
                     );
@@ -145,14 +147,14 @@ export default function MetricsHeatmap({
             })}
           </div>
 
-          <div className="mt-2 flex items-center justify-between text-[9px] text-muted">
-            <span>LOW</span>
-            <span className="flex items-center gap-1">
+          <div className="mt-4 flex items-center justify-between rounded-full bg-[#f8fafc] px-3 py-2 ring-1 ring-[#f1f5f9]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">Low intensity</span>
+            <span className="flex items-center gap-1.5">
               {HEAT_ROWS.map((r) => (
-                <span key={r.key} className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: METRICS.find((m) => m.key === r.key)!.accent }} />
+                <span key={r.key} className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-white shadow-sm" style={{ backgroundColor: METRICS.find((m) => m.key === r.key)!.accent }} />
               ))}
             </span>
-            <span>HIGH</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#94a3b8]">High intensity</span>
           </div>
         </div>
       )}

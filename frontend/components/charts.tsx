@@ -63,23 +63,23 @@ function ChartTooltip({
       : String(label ?? "");
 
   return (
-    <div className="rounded-lg border border-line2 bg-elev px-3 py-2 shadow-lg">
-      <p className="mb-1.5 text-[10px] text-muted">{labelText}</p>
+    <div className="rounded-xl border border-[#e2e8f0] bg-white px-3 py-2.5 shadow-lg">
+      <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-[#64748b]">{labelText}</p>
       {payload.map((item) => {
         const key = String(item.dataKey);
         const meta = series.find((s) => s.key === key);
         const value = typeof item.value === "number" ? item.value.toLocaleString() : "—";
         return (
-          <div key={key} className="flex items-center justify-between gap-4 text-[11px]">
-            <span className="flex items-center gap-1.5 text-secondary">
+          <div key={key} className="flex items-center justify-between gap-4 text-xs">
+            <span className="flex items-center gap-2 font-medium text-[#334155]">
               <span
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: meta?.color ?? item.color ?? "#929797" }}
+                className="inline-block h-2 w-2 rounded-full"
+                style={{ backgroundColor: meta?.color ?? item.color ?? "#64748b" }}
               />
               {meta?.label ?? key}
             </span>
-            <span className="font-medium text-ink text-tabular">
-              {value} {meta?.unit ?? ""}
+            <span className="font-bold text-[#0f172a] text-tabular">
+              {value} <span className="font-medium text-[#64748b]">{meta?.unit ?? ""}</span>
             </span>
           </div>
         );
@@ -100,7 +100,7 @@ function sharedAxis() {
           new Date(v).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
         }
         minTickGap={40}
-        tick={{ fontSize: 10 }}
+        tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
         axisLine={false}
         tickLine={false}
       />
@@ -108,7 +108,7 @@ function sharedAxis() {
     y: (
       <YAxis
         width={42}
-        tick={{ fontSize: 10 }}
+        tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
         axisLine={false}
         tickLine={false}
         domain={["auto", "auto"]}
@@ -129,10 +129,10 @@ export function TrendChartView({
   const { x, y } = sharedAxis();
 
   const legend = showLegend ? (
-    <div className="mb-2 flex flex-wrap items-center gap-3">
+    <div className="mb-3 flex flex-wrap items-center gap-2">
       {series.map((s) => (
-        <span key={s.key} className="flex items-center gap-1.5 text-[11px] text-secondary">
-          <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.color }} />
+        <span key={s.key} className="flex items-center gap-2 rounded-full border border-[#f1f5f9] bg-[#f8fafc] px-2.5 py-1 text-xs font-medium text-[#334155]">
+          <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
           {s.label}
         </span>
       ))}
@@ -145,19 +145,19 @@ export function TrendChartView({
       <ResponsiveContainer width="100%" height="100%">
         {area ? (
           <AreaChart data={data} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
             {x}
             {y}
             <Tooltip
               content={<ChartTooltip series={series} />}
-              cursor={{ stroke: "rgba(255,255,255,0.12)" }}
+              cursor={{ stroke: "#e2e8f0", strokeWidth: 1, strokeDasharray: "4 4" }}
             />
             {refLine && (
               <ReferenceLine
                 y={refLine.y}
-                stroke={refLine.color ?? "#F5B942"}
+                stroke={refLine.color ?? "#d97706"}
                 strokeDasharray="4 4"
-                label={{ value: refLine.label, position: "right", fill: refLine.color ?? "#F5B942", fontSize: 9 }}
+                label={{ value: refLine.label, position: "right", fill: refLine.color ?? "#d97706", fontSize: 10, fontWeight: 700 }}
               />
             )}
             {series.map((s) => (
@@ -166,8 +166,8 @@ export function TrendChartView({
                 type="monotone"
                 dataKey={s.key}
                 stroke={s.color}
-                strokeWidth={1.8}
-                fill={`${s.color}1f`}
+                strokeWidth={2}
+                fill={`${s.color}14`}
                 dot={false}
                 isAnimationActive
                 animationDuration={300}
@@ -176,19 +176,19 @@ export function TrendChartView({
           </AreaChart>
         ) : (
           <LineChart data={data} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
             {x}
             {y}
             <Tooltip
               content={<ChartTooltip series={series} />}
-              cursor={{ stroke: "rgba(255,255,255,0.12)" }}
+              cursor={{ stroke: "#e2e8f0", strokeWidth: 1 }}
             />
             {refLine && (
               <ReferenceLine
                 y={refLine.y}
-                stroke={refLine.color ?? "#F5B942"}
+                stroke={refLine.color ?? "#d97706"}
                 strokeDasharray="4 4"
-                label={{ value: refLine.label, position: "right", fill: refLine.color ?? "#F5B942", fontSize: 9 }}
+                label={{ value: refLine.label, position: "right", fill: refLine.color ?? "#d97706", fontSize: 10, fontWeight: 700 }}
               />
             )}
             {series.map((s) => (
@@ -197,10 +197,10 @@ export function TrendChartView({
                 type="monotone"
                 dataKey={s.key}
                 stroke={s.color}
-                strokeWidth={1.8}
+                strokeWidth={2}
                 dot={false}
                 connectNulls
-                activeDot={{ r: 3 }}
+                activeDot={{ r: 4, strokeWidth: 2, fill: s.color, stroke: "white" }}
                 isAnimationActive
                 animationDuration={300}
               />
@@ -217,7 +217,7 @@ export function BarChartView({
   series,
   height = 230,
   className,
-  radius = 3,
+  radius = 6,
   xKey,
   children,
 }: BaseProps & { radius?: number; xKey?: string; children?: ReactNode }) {
@@ -225,22 +225,22 @@ export function BarChartView({
     <div className={cn("w-full", className)} style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
           <XAxis
             dataKey={xKey ?? "time"}
-            tick={{ fontSize: 10 }}
+            tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }}
             axisLine={false}
             tickLine={false}
           />
-          <YAxis width={42} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-          <Tooltip content={<ChartTooltip series={series} />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+          <YAxis width={42} tick={{ fontSize: 10, fill: "#64748b", fontWeight: 500 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<ChartTooltip series={series} />} cursor={{ fill: "#f8fafc" }} />
           {series.map((s) => (
             <Bar
               key={s.key}
               dataKey={s.key}
               fill={s.color}
-              radius={radius}
-              maxBarSize={56}
+              radius={[radius, radius, 0, 0]}
+              maxBarSize={44}
               animationDuration={350}
             />
           ))}
@@ -253,8 +253,8 @@ export function BarChartView({
 
 export function EmptyChart({ label }: { label?: string }) {
   return (
-    <div className="flex w-full items-center justify-center text-secondary">
-      <span className="text-xs">{label ?? "No data available"}</span>
+    <div className="flex w-full items-center justify-center rounded-xl border border-dashed border-[#e2e8f0] bg-[#f8fafc] py-12">
+      <span className="text-sm font-medium text-[#64748b]">{label ?? "No data available"}</span>
     </div>
   );
 }

@@ -44,7 +44,7 @@ const COMPARE_METRICS: Array<{
   { label: "UV", key: "avg_uv", unit: "", precision: 2 },
 ];
 
-const NODE_COLORS = ["#4ADE80", "#60A5FA", "#A78BFA", "#F5B942"];
+const NODE_COLORS = ["#059669", "#2563eb", "#7c3aed", "#d97706"];
 
 function fmt(value: unknown, precision: number): string {
   return typeof value === "number" && Number.isFinite(value)
@@ -99,19 +99,19 @@ export default function AnalyticsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[20px] font-semibold tracking-tight text-ink">Analytics</h1>
-          <p className="mt-1 text-[12px] text-muted">
+          <h1 className="text-[20px] font-semibold tracking-tight text-[#0f172a]">Analytics</h1>
+          <p className="mt-1 text-[12px] text-[#64748b]">
             Per-node statistics and cross-node environmental comparison
           </p>
         </div>
-        <div className="flex gap-1 rounded-lg border border-line bg-card p-1">
+        <div className="flex gap-1 rounded-lg border border-[#e2e8f0] bg-white p-1">
           {RANGES.map((r) => (
             <button
               key={r.hours}
               onClick={() => setHours(r.hours)}
               className={cn(
                 "rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors",
-                hours === r.hours ? "bg-white/[0.09] text-ink" : "text-muted hover:text-secondary",
+                hours === r.hours ? "bg-[#2563eb] text-white shadow-sm text-[#0f172a]" : "text-[#64748b] hover:text-[#334155]",
               )}
             >
               {r.label}
@@ -127,25 +127,25 @@ export default function AnalyticsPage() {
             {nodes.length === 0 ? (
               <EmptyState message="No data available" />
             ) : (
-              <div className="flex flex-col gap-px bg-line/40">
+              <div className="flex flex-col gap-px bg-[#f1f5f9]">
                 {nodes.map((n) => {
                   const s = summaryByNode[n.node_id];
                   return (
-                    <div key={n.node_id} className="bg-card p-3">
+                    <div key={n.node_id} className="bg-white p-3">
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="font-mono text-[12px] font-semibold text-ink">{n.node_id}</span>
-                        <span className="text-[10px] text-muted">{n.location}</span>
+                        <span className="font-mono text-[12px] font-semibold text-[#0f172a]">{n.node_id}</span>
+                        <span className="text-[10px] text-[#64748b]">{n.location}</span>
                         {s && (
-                          <span className="ml-auto text-[10px] text-muted">
+                          <span className="ml-auto text-[10px] text-[#64748b]">
                             {s.reading_count?.toLocaleString?.() ?? "—"} readings
                           </span>
                         )}
                       </div>
-                      <div className="grid grid-cols-3 gap-px bg-line/40 sm:grid-cols-9">
+                      <div className="grid grid-cols-3 gap-px bg-[#f1f5f9] sm:grid-cols-9">
                         {SUMMARY_COLS.map((col) => (
-                          <div key={col.key} className="flex flex-col gap-0.5 bg-card2 px-2.5 py-2">
-                            <span className="text-[9px] uppercase tracking-wider text-muted">{col.label}</span>
-                            <span className="text-tabular text-[12px] font-medium text-ink">
+                          <div key={col.key} className="flex flex-col gap-0.5 bg-[#f8fafc] px-2.5 py-2">
+                            <span className="text-[9px] uppercase tracking-wider text-[#64748b]">{col.label}</span>
+                            <span className="text-tabular text-[12px] font-medium text-[#0f172a]">
                               {s ? fmt(s[col.key], 1) : "—"}
                               {col.key.includes("temperature") ? "°" : col.key.includes("humidity") ? "%" : ""}
                             </span>
@@ -177,15 +177,15 @@ export default function AnalyticsPage() {
                     unit: m.unit,
                   }));
                   return (
-                    <div key={m.key} className="border-b border-line/60 px-3 py-2.5 last:border-b-0">
-                      <div className="flex items-center justify-between text-[11px] text-muted">
+                    <div key={m.key} className="border-b border-[#f1f5f9] px-3 py-2.5 last:border-b-0">
+                      <div className="flex items-center justify-between text-[11px] text-[#64748b]">
                         <span>{m.label}</span>
                         <span className="flex items-center gap-2">
                           {rows.map((r) => (
                             <span key={r.label} className="flex items-center gap-1">
                               <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ backgroundColor: r.color }} />
-                              <b className="text-tabular text-[12px] font-medium text-ink">
-                                {r.value} <span className="font-normal text-muted">{r.unit}</span>
+                              <b className="text-tabular text-[12px] font-medium text-[#0f172a]">
+                                {r.value} <span className="font-normal text-[#64748b]">{r.unit}</span>
                               </b>
                             </span>
                           ))}

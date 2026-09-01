@@ -7,9 +7,4 @@ NODES = [
         "name": "Node 01",
         "location": "Main Block",
     },
-    {
-        "node_id": "SCEMS_NODE_02",
-        "name": "Node 02",
-        "location": "Library",
-    },
 ]

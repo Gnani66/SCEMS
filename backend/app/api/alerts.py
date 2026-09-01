@@ -15,7 +15,12 @@ router = APIRouter(
 def get_alerts(
     status: str | None = None,
     limit: int = 100,
+    hours: int | None = None,
 ):
+    # Default: only recent alerts (last 24h) to avoid showing 18-day-old fake alerts
+    # hours=None => no time filter; hours=24 => last 24h
+    if hours is None:
+        hours = 24
 
     with get_connection() as connection:
 
@@ -28,11 +33,13 @@ def get_alerts(
                     SELECT *
                     FROM alerts
                     WHERE status = %s
+                    AND created_at >= NOW() - (%s * INTERVAL '1 hour')
                     ORDER BY created_at DESC
                     LIMIT %s
                     """,
                     (
                         status,
+                        hours,
                         limit,
                     ),
                 )
@@ -43,10 +50,11 @@ def get_alerts(
                     """
                     SELECT *
                     FROM alerts
+                    WHERE created_at >= NOW() - (%s * INTERVAL '1 hour')
                     ORDER BY created_at DESC
                     LIMIT %s
                     """,
-                    (limit,),
+                    (hours, limit,),
                 )
 
             rows = cursor.fetchall()

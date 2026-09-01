@@ -10,9 +10,8 @@ import { useApi } from "@/hooks/useApi";
 import { useRealtime, type TrendMetric } from "@/providers/realtime";
 import { METRIC_MAP, METRICS, type MetricKey, seriesStats } from "@/lib/metrics";
 
-const NODE_COLORS = ["#4ADE80", "#60A5FA", "#A78BFA", "#F5B942", "#F87171", "#34D399"];
+const NODE_COLORS = ["#2563eb", "#059669", "#d97706", "#7c3aed", "#dc2626", "#0891b2"];
 
-/** How many realtime points from the shared WebSocket trend buffer to overlay. */
 const TREND_TAIL = 80;
 
 export default function LiveTrendChart({
@@ -28,7 +27,6 @@ export default function LiveTrendChart({
   const [node, setNode] = useState<string>("all");
   const meta = METRIC_MAP[metric];
   const { trend } = useRealtime();
-
   const nodesKey = nodes.join("|");
 
   const historyQ = useApi(
@@ -43,7 +41,6 @@ export default function LiveTrendChart({
 
   const { chartData, seriesConfig, stats } = useMemo(() => {
     const rows = historyQ.data?.readings ?? [];
-
     const candidateIds =
       node === "all"
         ? Array.from(
@@ -57,7 +54,6 @@ export default function LiveTrendChart({
       return hasHistory || hasTrend;
     });
 
-    // Merge DB history + the live WebSocket tail into a single series per node.
     const byNode = new Map<string, Map<number, number | null>>();
     const times = new Set<number>();
     for (const id of nodeIds) {
@@ -104,27 +100,27 @@ export default function LiveTrendChart({
   return (
     <Card
       className="h-full"
-      kicker="Realtime"
+      kicker="Realtime streaming"
       title="Environmental Trends"
       right={
-        <span className="flex items-center gap-1.5 text-[10px] font-semibold text-ok">
-          <span className="h-1.5 w-1.5 rounded-full bg-ok" style={{ animation: "pulse-ring 1.8s ease-out infinite" }} />
+        <span className="flex items-center gap-1.5 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-1 text-[10px] font-bold tracking-wide text-[#059669]">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#059669]" style={{ animation: "pulse-ring 1.8s ease-out infinite" }} />
           LIVE
         </span>
       }
     >
       <div className="flex flex-col">
-        <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 border-b border-[#f1f5f9] bg-[#f8fafc] px-4 py-2.5">
           <div className="flex flex-wrap gap-1">
             {METRICS.filter((m) => m.key !== "rain" && m.key !== "pressure").map((m) => (
               <button
                 key={m.key}
                 onClick={() => setMetric(m.key)}
                 className={cn(
-                  "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
+                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-all",
                   metric === m.key
-                    ? "bg-white/[0.09] text-ink"
-                    : "text-muted hover:text-secondary",
+                    ? "bg-[#2563eb] text-white shadow-sm"
+                    : "bg-white text-[#64748b] ring-1 ring-[#e2e8f0] hover:text-[#0f172a] hover:ring-[#cbd5e1]",
                 )}
               >
                 {m.short}
@@ -136,42 +132,43 @@ export default function LiveTrendChart({
             <button
               onClick={() => setNode("all")}
               className={cn(
-                "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
-                node === "all" ? "bg-white/[0.09] text-ink" : "text-muted hover:text-secondary",
+                "rounded-full px-3 py-1.5 text-xs font-semibold transition-all",
+                node === "all" ? "bg-[#0f172a] text-white shadow-sm" : "bg-white text-[#64748b] ring-1 ring-[#e2e8f0] hover:text-[#0f172a]",
               )}
             >
-              All
+              All nodes
             </button>
             {nodes.map((id) => (
               <button
                 key={id}
                 onClick={() => setNode(id)}
                 className={cn(
-                  "rounded-md px-2 py-1 text-[11px] font-medium transition-colors",
-                  node === id ? "bg-white/[0.09] text-ink" : "text-muted hover:text-secondary",
+                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-all",
+                  node === id ? "bg-[#0f172a] text-white shadow-sm" : "bg-white text-[#64748b] ring-1 ring-[#e2e8f0] hover:text-[#0f172a]",
                 )}
               >
-                {id.replace("SCEMS_NODE_", "NODE ")}
+                {id.replace("SCEMS_NODE_", "N")}
               </button>
             ))}
           </div>
         </div>
 
         {stats && (
-          <div className="flex gap-4 border-b border-line px-3 py-2 text-[11px] text-secondary">
-            <span>MIN <b className="text-tabular text-ink">{stats.min.toFixed(2)}</b></span>
-            <span>AVG <b className="text-tabular text-ink">{stats.avg.toFixed(2)}</b></span>
-            <span>MAX <b className="text-tabular text-ink">{stats.max.toFixed(2)}</b></span>
-            <span className="ml-auto text-muted">{meta.unit}</span>
+          <div className="flex gap-4 border-b border-[#f1f5f9] px-4 py-2.5 text-xs">
+            <span className="text-[#64748b]">MIN <b className="text-tabular font-bold text-[#0f172a]">{stats.min.toFixed(2)}</b></span>
+            <span className="text-[#64748b]">AVG <b className="text-tabular font-bold text-[#2563eb]">{stats.avg.toFixed(2)}</b></span>
+            <span className="text-[#64748b]">MAX <b className="text-tabular font-bold text-[#0f172a]">{stats.max.toFixed(2)}</b></span>
+            <span className="ml-auto rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[11px] font-medium text-[#64748b]">{meta.unit}</span>
           </div>
         )}
 
-        <div className="px-3 py-2">
+        <div className="px-4 py-4">
           {historyQ.loading && chartData.length === 0 ? (
             <Skeleton className="h-[180px] w-full" />
           ) : chartData.length === 0 ? (
-            <div className="flex h-[180px] items-center justify-center">
-              <p className="text-xs text-muted">No data available</p>
+            <div className="flex h-[180px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#e2e8f0] bg-[#f8fafc]">
+              <p className="text-sm font-medium text-[#64748b]">No trend data yet</p>
+              <p className="text-xs text-[#94a3b8]">Connect a node to see live trends</p>
             </div>
           ) : (
             <TrendChartView

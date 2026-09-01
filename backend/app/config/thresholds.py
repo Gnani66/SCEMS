@@ -1,7 +1,7 @@
 THRESHOLDS = {
     "temperature": {
-        "warning": 28.0,
-        "critical": 29.0,
+        "warning": 35.0,
+        "critical": 40.0,
     },
 
     "humidity": {

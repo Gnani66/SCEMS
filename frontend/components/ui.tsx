@@ -23,7 +23,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "panel flex min-w-0 flex-col",
+        "panel flex min-w-0 flex-col bg-white",
         hover && "panel-hover",
         className,
       )}
@@ -31,21 +31,21 @@ export function Card({
       {(title || kicker || right) && (
         <div
           className={cn(
-            "flex items-center justify-between gap-3 border-b border-line px-4",
-            dense ? "py-2.5" : "py-3",
+            "flex items-center justify-between gap-3 border-b border-[#f1f5f9] bg-white px-5",
+            dense ? "py-3" : "py-4",
           )}
         >
           <div className="min-w-0">
-            {kicker && <p className="section-kicker mb-1">{kicker}</p>}
-            <div className="truncate text-[13px] font-medium leading-tight text-ink">
+            {kicker && <p className="section-kicker mb-1.5">{kicker}</p>}
+            <div className="truncate text-[13px] font-semibold leading-tight text-[#0f172a] tracking-tight">
               {title}
             </div>
           </div>
           {right && <div className="flex shrink-0 items-center gap-2">{right}</div>}
         </div>
       )}
-      <div className={cn("flex-1 min-w-0", !title && !kicker && "p-4")}>{children}</div>
-      {footer && <div className="border-t border-line px-4 py-2.5">{footer}</div>}
+      <div className={cn("flex-1 min-w-0 bg-white", !title && !kicker && "p-4")}>{children}</div>
+      {footer && <div className="border-t border-[#f1f5f9] bg-[#f8fafc] px-5 py-3">{footer}</div>}
     </div>
   );
 }
@@ -60,10 +60,10 @@ export function CardHeader({
   right?: ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
+    <div className="flex items-center justify-between gap-3 border-b border-[#f1f5f9] bg-white px-5 py-4">
       <div className="min-w-0">
-        {kicker && <p className="section-kicker mb-1">{kicker}</p>}
-        <div className="truncate text-[13px] font-medium text-ink">{title}</div>
+        {kicker && <p className="section-kicker mb-1.5">{kicker}</p>}
+        <div className="truncate text-[13px] font-semibold text-[#0f172a] tracking-tight">{title}</div>
       </div>
       {right && <div className="flex shrink-0 items-center gap-2">{right}</div>}
     </div>
@@ -100,9 +100,15 @@ export function EmptyState({
   sub?: string;
 }) {
   return (
-    <div className="flex min-h-[120px] flex-col items-center justify-center gap-1 px-4 text-center">
-      <p className="text-[13px] text-secondary">{message}</p>
-      {sub && <p className="text-xs text-muted">{sub}</p>}
+    <div className="flex min-h-[140px] flex-col items-center justify-center gap-1.5 px-6 py-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f1f5f9] text-[#94a3b8]">
+        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+          <circle cx={12} cy={12} r={9} />
+          <path d="M9 9h.01M15 9h.01M8 14h8" />
+        </svg>
+      </div>
+      <p className="text-sm font-medium text-[#334155]">{message}</p>
+      {sub && <p className="text-xs text-[#64748b]">{sub}</p>}
     </div>
   );
 }
@@ -117,13 +123,19 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex min-h-[120px] flex-col items-center justify-center gap-3 px-4 text-center">
-      <p className="text-[13px] text-crit">{message}</p>
-      {sub && <p className="text-[11px] text-muted">{sub}</p>}
+    <div className="flex min-h-[140px] flex-col items-center justify-center gap-3 px-6 py-8 text-center">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fef2f2] text-[#dc2626]">
+        <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+          <path d="M10.3 3.5 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.5a2 2 0 0 0-3.4 0z" />
+          <path d="M12 9v4M12 17h.01" />
+        </svg>
+      </div>
+      <p className="text-sm font-medium text-[#dc2626]">{message}</p>
+      {sub && <p className="text-xs text-[#64748b]">{sub}</p>}
       {onRetry && (
         <button
           onClick={onRetry}
-          className="rounded-md border border-line2 px-3 py-1 text-xs text-secondary transition-colors hover:text-ink"
+          className="rounded-lg border border-[#e2e8f0] bg-white px-4 py-1.5 text-xs font-medium text-[#334155] shadow-sm transition-colors hover:border-[#cbd5e1] hover:text-[#0f172a]"
         >
           Retry
         </button>
@@ -153,7 +165,7 @@ export function StatusDot({
         />
       )}
       <span
-        className="relative rounded-full"
+        className="relative rounded-full ring-2 ring-white shadow-sm"
         style={{ width: size, height: size, backgroundColor: color }}
       />
     </span>
@@ -169,16 +181,29 @@ export function Pill({
   color: string;
   className?: string;
 }) {
+  // Map critical colors to light soft backgrounds automatically
+  const bg =
+    color === "#EF4444" || color === "#dc2626" ? "#fef2f2" :
+    color === "#F5B942" || color === "#d97706" ? "#fffbeb" :
+    color === "#4ADE80" || color === "#059669" ? "#ecfdf5" :
+    color === "#60a5fa" || color === "#2563eb" ? "#eff6ff" : `${color}14`;
+
+  const border =
+    color === "#EF4444" || color === "#dc2626" ? "#fecaca" :
+    color === "#F5B942" || color === "#d97706" ? "#fde68a" :
+    color === "#4ADE80" || color === "#059669" ? "#a7f3d0" :
+    color === "#60a5fa" || color === "#2563eb" ? "#bfdbfe" : `${color}30`;
+
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-wide",
         className,
       )}
       style={{
         color,
-        borderColor: `${color}44`,
-        backgroundColor: `${color}14`,
+        borderColor: border,
+        backgroundColor: bg,
       }}
     >
       {children}
@@ -187,15 +212,12 @@ export function Pill({
 }
 
 export function SeverityBadge({ severity }: { severity: string }) {
-  const color =
-    severity === "critical"
-      ? "#EF4444"
-      : severity === "warning"
-        ? "#F5B942"
-        : severity === "acknowledged"
-          ? "#666C6C"
-          : "#929797";
-  return <Pill color={color}>{severity.toUpperCase()}</Pill>;
+  const s = severity?.toLowerCase();
+  if (s === "critical") return <Pill color="#dc2626">CRITICAL</Pill>;
+  if (s === "warning") return <Pill color="#d97706">WARNING</Pill>;
+  if (s === "acknowledged") return <Pill color="#64748b">ACKNOWLEDGED</Pill>;
+  if (s === "normal") return <Pill color="#059669">NORMAL</Pill>;
+  return <Pill color="#64748b">{severity?.toUpperCase() ?? "UNKNOWN"}</Pill>;
 }
 
 export function MetricChip({
@@ -212,20 +234,20 @@ export function MetricChip({
   color?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 p-3">
-      <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted">
+    <div className="flex flex-col gap-1.5 rounded-xl border border-[#f1f5f9] bg-[#f8fafc] p-3">
+      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
         {icon}
         {label}
       </div>
       <div className="flex items-baseline gap-1">
-        <span className="text-tabular text-lg font-semibold leading-none text-ink">
+        <span className="text-tabular text-lg font-bold leading-none text-[#0f172a]">
           {value}
         </span>
-        {unit && <span className="text-xs text-secondary">{unit}</span>}
+        {unit && <span className="text-xs font-medium text-[#64748b]">{unit}</span>}
       </div>
       {color && (
-        <div className="mt-1 h-0.5 w-full rounded-full bg-line2">
-          <div className="h-full rounded-full" style={{ width: `${color}` }} />
+        <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-[#e2e8f0]">
+          <div className="h-full rounded-full" style={{ width: `${color}`, backgroundColor: "#2563eb" }} />
         </div>
       )}
     </div>

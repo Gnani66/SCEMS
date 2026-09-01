@@ -6,8 +6,7 @@ import { METRICS, METRIC_MAP, type MetricKey } from "@/lib/metrics";
 export type AggregateData = Partial<Record<MetricKey, number | boolean>>;
 
 /**
- * Campus-wide environmental data panel. Aggregated average of the
- * actual node readings received from the backend / WebSocket.
+ * Campus-wide environmental data — Zoho white KPI tiles
  */
 export default function EnvironmentalMetrics({
   data,
@@ -25,14 +24,16 @@ export default function EnvironmentalMetrics({
       title="Environmental Data"
       right={
         statusText && (
-          <span className="text-[11px] text-muted">{statusText}</span>
+          <span className="rounded-full bg-[#f1f5f9] px-2.5 py-1 text-[11px] font-medium text-[#64748b] ring-1 ring-[#e2e8f0]">
+            {statusText}
+          </span>
         )
       }
     >
       {values.length === 0 ? (
-        <EmptyState message="No data available" />
+        <EmptyState message="No live data" sub="Waiting for sensor nodes to report" />
       ) : (
-        <div className="grid grid-cols-2 gap-x-px gap-y-px bg-line/40 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10">
+        <div className="grid grid-cols-2 gap-px bg-[#f1f5f9] sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10">
           {METRICS.map((meta) => {
             const raw = data[meta.key];
             if (raw == null) return null;
@@ -48,25 +49,31 @@ export default function EnvironmentalMetrics({
             return (
               <div
                 key={meta.key}
-                className="flex min-w-0 flex-col gap-1.5 bg-card p-3 transition-colors hover:bg-card2"
+                className="group flex min-w-0 flex-col gap-2 bg-white p-4 transition-all hover:bg-[#f8fafc]"
               >
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted">
-                  {meta.short}
-                </span>
-                <span className="flex items-baseline gap-1">
-                  <span className="text-tabular text-lg font-semibold leading-none text-ink">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#64748b]">
+                    {meta.short}
+                  </span>
+                  <span
+                    className="h-2 w-2 rounded-full"
+                    style={{ backgroundColor: meta.accent }}
+                  />
+                </div>
+                <span className="flex items-baseline gap-1.5">
+                  <span className="text-tabular text-[22px] font-bold leading-none tracking-tight text-[#0f172a]">
                     {display}
                   </span>
                   {meta.key !== "rain" && meta.unit && (
-                    <span className="text-[10px] text-secondary">{meta.unit}</span>
+                    <span className="text-[11px] font-medium text-[#64748b]">{meta.unit}</span>
                   )}
                 </span>
-                <span className="flex items-center gap-1.5 text-[10px] text-muted">
-                  <span className="text-xs" style={{ color: meta.accent }}>{meta.label}</span>
+                <span className="text-[11px] font-medium" style={{ color: meta.accent }}>
+                  {meta.label}
                 </span>
-                <div className="h-0.5 w-full overflow-hidden rounded-full bg-line2">
+                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#f1f5f9]">
                   <div
-                    className="h-full rounded-full transition-[width] duration-500"
+                    className="h-full rounded-full transition-[width] duration-700 ease-out"
                     style={{ width: `${pct}%`, backgroundColor: meta.accent }}
                   />
                 </div>

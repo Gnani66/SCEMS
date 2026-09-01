@@ -44,21 +44,20 @@ function RailButton({
     <Link
       href={href}
       onClick={onNavigate}
-      title={label}
       aria-label={label}
       className={cn(
-        "group relative flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
+        "group relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-150",
         active
-          ? "bg-white/[0.07] text-ink shadow-[inset_0_0_0_1px_rgba(255,255,255,0.10)]"
-          : "text-muted hover:bg-white/[0.04] hover:text-secondary",
+          ? "bg-[#eff6ff] text-[#2563eb] shadow-[inset_0_0_0_1px_#dbeafe]"
+          : "text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#334155]",
       )}
     >
       {active && (
-        <span className="absolute -left-[9px] h-5 w-[2px] rounded-full bg-ok" />
+        <span className="absolute -left-[10px] h-6 w-[3px] rounded-full bg-[#2563eb]" />
       )}
-      <Icon size={17} />
-      {/* tooltip */}
-      <span className="pointer-events-none absolute left-[calc(100%+10px)] z-50 whitespace-nowrap rounded-md border border-line2 bg-elev px-2.5 py-1 text-[11px] font-medium text-ink opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100">
+      <Icon size={18} />
+      {/* Zoho-style tooltip — white card */}
+      <span className="pointer-events-none absolute left-[calc(100%+12px)] z-50 whitespace-nowrap rounded-lg border border-[#e2e8f0] bg-white px-3 py-1.5 text-xs font-medium text-[#0f172a] opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
         {label}
       </span>
     </Link>
@@ -71,13 +70,19 @@ export default function Sidebar() {
 
   const content = (
     <>
-      <div className="flex h-14 items-center justify-center border-b border-line">
-        <Link href="/" className="flex h-9 w-9 items-center justify-center rounded-lg border border-line2 bg-card2 text-ok" title="SCEMS Home">
+      {/* Brand */}
+      <div className="flex h-[64px] items-center justify-center border-b border-[#e2e8f0] bg-white">
+        <Link
+          href="/"
+          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2563eb] text-white shadow-sm"
+          title="SCEMS Home"
+        >
           <IconLogo size={20} />
         </Link>
       </div>
 
-      <nav className="flex flex-1 flex-col items-center gap-1.5 overflow-y-auto py-4">
+      {/* Navigation */}
+      <nav className="flex flex-1 flex-col items-center gap-1.5 overflow-y-auto py-5">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           return (
@@ -93,13 +98,23 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="flex flex-col items-center gap-1 border-t border-line py-3">
+      {/* Footer actions */}
+      <div className="flex flex-col items-center gap-2 border-t border-[#e2e8f0] bg-[#f8fafc] py-4">
+        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#dcfce7] text-[10px] font-bold text-[#15803d] ring-1 ring-[#bbf7d0]">
+          A
+        </div>
+        <span className="text-[10px] font-medium text-[#64748b]">Admin</span>
         <Link
           href="/system"
           title="System Settings"
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-muted transition-colors hover:bg-white/[0.04] hover:text-secondary"
+          className={cn(
+            "mt-1 flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
+            pathname === "/system"
+              ? "bg-[#eff6ff] text-[#2563eb]"
+              : "text-[#94a3b8] hover:bg-white hover:text-[#64748b] hover:shadow-sm hover:border hover:border-[#e2e8f0]",
+          )}
         >
-          <IconSettings size={17} />
+          <IconSettings size={18} />
         </Link>
       </div>
     </>
@@ -107,8 +122,8 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Desktop rail */}
-      <aside className="hidden w-16 shrink-0 flex-col border-r border-line bg-app2 md:flex">
+      {/* Desktop rail — Zoho light */}
+      <aside className="hidden w-[72px] shrink-0 flex-col border-r border-[#e2e8f0] bg-white md:flex shadow-[1px_0_3px_rgba(15,23,42,0.04)]">
         {content}
       </aside>
 
@@ -117,24 +132,28 @@ export default function Sidebar() {
         <div className="fixed inset-0 z-50 flex md:hidden">
           <button
             aria-label="Close menu"
-            className="flex-1 bg-black/60"
+            className="flex-1 bg-[#0f172a]/40 backdrop-blur-sm"
             onClick={() => setOpen(false)}
           />
-          <aside className="flex w-16 flex-col border-r border-line bg-app2">
-            <button className="flex h-14 items-center justify-center border-b border-line text-muted" onClick={() => setOpen(false)}>
-              <IconSettings size={16} />
+          <aside className="flex w-[72px] flex-col border-r border-[#e2e8f0] bg-white shadow-xl">
+            <button
+              className="flex h-[64px] items-center justify-center border-b border-[#e2e8f0] text-[#64748b]"
+              onClick={() => setOpen(false)}
+            >
+              <IconLogo size={20} />
             </button>
             {content}
           </aside>
         </div>
       )}
 
+      {/* Mobile FAB */}
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-4 right-4 z-40 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-card text-secondary shadow-lg md:hidden"
+        className="fixed bottom-5 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2563eb] text-white shadow-lg shadow-[#2563eb]/20 md:hidden"
         aria-label="Open menu"
       >
-        <IconLogo size={18} />
+        <IconLogo size={20} />
       </button>
     </>
   );

@@ -99,7 +99,7 @@ export default function NodeDetail({ nodeId }: { nodeId: string }) {
       </div>
 
       {/* Current metrics */}
-      <section className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line/40 sm:grid-cols-5 xl:grid-cols-10">
+      <section className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-[#f1f5f9] sm:grid-cols-5 xl:grid-cols-10">
         {METRICS.map((meta) => {
           const raw = d?.[meta.key];
           const has = raw != null;
@@ -126,7 +126,7 @@ export default function NodeDetail({ nodeId }: { nodeId: string }) {
             ) : undefined
           }
         >
-          <div className="grid grid-cols-2 gap-px bg-line/40 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-px bg-[#f1f5f9] sm:grid-cols-4">
             {[
               ["Wi-Fi Signal", health ? `${health.wifi_rssi} dBm` : "—"],
               ["Uptime", health ? formatUptime(health.uptime) : "—"],

@@ -17,7 +17,7 @@ const RANGES = [
   { label: "7 Days", hours: 168 },
 ];
 
-const NODE_COLORS = ["#4ADE80", "#60A5FA", "#A78BFA", "#F5B942"];
+const NODE_COLORS = ["#059669", "#2563eb", "#7c3aed", "#d97706"];
 
 export default function HistoryPage() {
   const { nodes: liveNodes } = useLiveNodes();
@@ -86,21 +86,21 @@ export default function HistoryPage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[20px] font-semibold tracking-tight text-ink">History</h1>
-          <p className="mt-1 text-[12px] text-muted">
+          <h1 className="text-[20px] font-semibold tracking-tight text-[#0f172a]">History</h1>
+          <p className="mt-1 text-[12px] text-[#64748b]">
             Historical environmental analysis by node, metric and time range
           </p>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-line bg-card px-3 py-2.5">
-        <label className="flex items-center gap-2 text-[11px] text-muted">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-3 py-2.5">
+        <label className="flex items-center gap-2 text-[11px] text-[#64748b]">
           Node
           <select
             value={node}
             onChange={(e) => setNode(e.target.value)}
-            className="rounded-md border border-line bg-card2 px-2 py-1.5 text-[12px] text-ink outline-none focus:border-line2"
+            className="rounded-md border border-[#e2e8f0] bg-[#f8fafc] px-2 py-1.5 text-[12px] text-[#0f172a] outline-none focus:border-[#cbd5e1]"
           >
             <option value="all">All Nodes</option>
             {liveNodes.map((n) => (
@@ -109,12 +109,12 @@ export default function HistoryPage() {
           </select>
         </label>
 
-        <label className="flex items-center gap-2 text-[11px] text-muted">
+        <label className="flex items-center gap-2 text-[11px] text-[#64748b]">
           Metric
           <select
             value={metric}
             onChange={(e) => setMetric(e.target.value as MetricKey)}
-            className="rounded-md border border-line bg-card2 px-2 py-1.5 text-[12px] text-ink outline-none focus:border-line2"
+            className="rounded-md border border-[#e2e8f0] bg-[#f8fafc] px-2 py-1.5 text-[12px] text-[#0f172a] outline-none focus:border-[#cbd5e1]"
           >
             {METRICS.filter((m) => m.key !== "rain").map((m) => (
               <option key={m.key} value={m.key}>{m.label}</option>
@@ -129,7 +129,7 @@ export default function HistoryPage() {
               onClick={() => setRange(r.hours)}
               className={cn(
                 "rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors",
-                range === r.hours ? "bg-white/[0.09] text-ink" : "text-muted hover:text-secondary",
+                range === r.hours ? "bg-[#2563eb] text-white shadow-sm text-[#0f172a]" : "text-[#64748b] hover:text-[#334155]",
               )}
             >
               {r.label}
@@ -141,15 +141,15 @@ export default function HistoryPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
         {[
-          ["Readings", data ? data.readings.length.toLocaleString() : "—", "#929797"],
-          ["Minimum", stats ? stats.min.toFixed(2) : "—", "#60A5FA"],
-          ["Average", stats ? stats.avg.toFixed(2) : "—", "#4ADE80"],
+          ["Readings", data ? data.readings.length.toLocaleString() : "—", "#64748b"],
+          ["Minimum", stats ? stats.min.toFixed(2) : "—", "#2563eb"],
+          ["Average", stats ? stats.avg.toFixed(2) : "—", "#059669"],
           ["Maximum", stats ? stats.max.toFixed(2) : "—", "#EF4444"],
-          ["Window", `${range}h`, "#929797"],
-          ["Unit", meta.unit || "—", "#929797"],
+          ["Window", `${range}h`, "#64748b"],
+          ["Unit", meta.unit || "—", "#64748b"],
         ].map(([label, value, color]) => (
-          <div key={label} className="rounded-xl border border-line bg-card px-3 py-2.5">
-            <p className="text-[9px] uppercase tracking-wider text-muted">{label}</p>
+          <div key={label} className="rounded-xl border border-[#e2e8f0] bg-white px-3 py-2.5">
+            <p className="text-[9px] uppercase tracking-wider text-[#64748b]">{label}</p>
             <p className="text-tabular text-[15px] font-semibold mt-0.5" style={{ color }}>
               {value}
             </p>

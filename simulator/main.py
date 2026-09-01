@@ -1,7 +1,6 @@
 import time
 
 from nodes.node_01 import create_node_01
-from nodes.node_02 import create_node_02
 
 from mqtt_client import MQTTClient
 
@@ -40,7 +39,6 @@ def publish_status(mqtt_client, node_number, status):
 
 def main():
     node_01 = create_node_01()
-    node_02 = create_node_02()
 
     mqtt_client = MQTTClient(
         client_id="SCEMS_VIRTUAL_SIMULATOR"
@@ -54,16 +52,9 @@ def main():
         "online",
     )
 
-    publish_status(
-        mqtt_client,
-        "02",
-        "online",
-    )
-
     print()
     print("SCEMS Virtual Sensor System")
-    print("Node 01 -> ONLINE")
-    print("Node 02 -> ONLINE")
+    print("Node 01 -> ONLINE (single-node mode)")
     print()
 
     try:
@@ -72,12 +63,6 @@ def main():
                 node_01,
                 mqtt_client,
                 "01",
-            )
-
-            publish_node_data(
-                node_02,
-                mqtt_client,
-                "02",
             )
 
             time.sleep(SIMULATION_INTERVAL)
@@ -89,12 +74,6 @@ def main():
         publish_status(
             mqtt_client,
             "01",
-            "offline",
-        )
-
-        publish_status(
-            mqtt_client,
-            "02",
             "offline",
         )
 

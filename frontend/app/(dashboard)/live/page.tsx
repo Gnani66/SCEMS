@@ -13,27 +13,27 @@ export default function LivePage() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[20px] font-semibold tracking-tight text-ink">Live Monitor</h1>
-          <p className="mt-1 text-[12px] text-muted">
+          <h1 className="text-[20px] font-semibold tracking-tight text-[#0f172a]">Live Monitor</h1>
+          <p className="mt-1 text-[12px] text-[#64748b]">
             Real-time sensor streams from every campus node
           </p>
         </div>
         <div
           className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold"
           style={{
-            color: connection === "connected" ? "#4ADE80" : "#F5B942",
-            borderColor: connection === "connected" ? "#4ADE8044" : "#F5B94244",
-            backgroundColor: connection === "connected" ? "#4ADE8012" : "#F5B94212",
+            color: connection === "connected" ? "#059669" : "#d97706",
+            borderColor: connection === "connected" ? "#05966944" : "#d9770644",
+            backgroundColor: connection === "connected" ? "#05966912" : "#d9770612",
           }}
         >
           <StatusDot
-            color={connection === "connected" ? "#4ADE80" : "#F5B942"}
+            color={connection === "connected" ? "#059669" : "#d97706"}
             pulse={connection === "connected"}
             size={6}
           />
           {connection === "connected" ? "REALTIME STREAM ACTIVE" : "RECONNECTING…"}
           {connectedAt && connection === "connected" ? (
-            <span className="hidden font-medium text-muted sm:inline">
+            <span className="hidden font-medium text-[#64748b] sm:inline">
               {new Date(connectedAt).toLocaleTimeString()}
             </span>
           ) : null}
